@@ -6,16 +6,21 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 const { checkAuthenticated, checkNotAuthenticated } = require("./middleware/auth");
 const app = express();
-const port = 4000;
+const config = require('config');
+const serverConfig = config.get('server')
+const port = serverConfig.port;
 
-const cookieEncryptionKey = ['key1', 'key2']
+require('dotenv').config();
+
+console.log(process.env.MONGO_URI)
+
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs')
 
 
 app.use(cookieSession({
     name: 'cookie-session-name',
-    keys: cookieEncryptionKey
+    keys: [process.env.COOKIE_ENCRYPTION_KEY]
 }))
 
 app.use(function(request, response, next) {
@@ -41,7 +46,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 
-mongoose.connect(`mongodb+srv://tkdwls237:tkdwls45@cluster0.rcpcfst.mongodb.net/?retryWrites=true&w=majority`)
+mongoose.connect(process.env.MONGO_URI)
     .then( () => {
         console.log("mongodb connected");
     })
@@ -105,6 +110,13 @@ app.post('/signup', async(req,res) => {
     }
 })
 
+app.get("/auth/google", passport.authenticate('google'));
+app.get("/auth/google/callback", passport.authenticate('google',{
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/login'
+}))
 app.listen(port, () => {
     console.log(`Listening on ${port}`);
 })
+
+

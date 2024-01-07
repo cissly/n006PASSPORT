@@ -1,0 +1,12 @@
+{
+    "server": {
+        "host": "localhost",
+        "port": 4000
+    },
+    "db": {
+        "type": "mongoose"
+    },
+    "cookie": {
+        "expiresin": 1201199
+    }
+}
